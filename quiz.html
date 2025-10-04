@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Play Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🎮 Quiz Time!</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="choose.html">Choose Quiz</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main id="quiz-container">
+    <h2>Answer the questions before the timer runs out ⏳</h2>
+    <div id="timer">Time left: <span id="time">60</span> seconds</div>
+
+    <form id="quizForm"></form>
+    <button type="button" id="submitBtn">Submit Quiz</button>
+    <div id="result"></div>
+  </main>
+
+  <footer>
+    <p>💫 Good luck! You got this!</p>
+  </footer>
+
+  <script>
+    // Detect category from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+
+    const quizForm = document.getElementById('quizForm');
+
+    // Questions (slightly harder)
+    const mathQuestions = [
+      { q: "1️⃣ Solve: 12 × 8 ÷ 4 + 3", options: ["27", "24", "30"], answer: "27" },
+      { q: "2️⃣ What is √144 + 15?", options: ["27", "25", "30"], answer: "27" },
+      { q: "3️⃣ Solve: (5² + 12²)^(1/2)", options: ["13", "17", "12"], answer: "13" },
+      { q: "4️⃣ If x=3 and y=4, what is 2x² + y²?", options: ["25", "28", "18"], answer: "28" },
+      { q: "5️⃣ Solve: 15% of 200 + 30 ÷ 2", options: ["45", "50", "60"], answer: "45" }
+    ];
+
+    const pythonQuestions = [
+      { q: "1️⃣ What is the output of: print(2 ** 3 ** 2)?", options: ["64", "512", "256"], answer: "512" },
+      { q: "2️⃣ Valid Python list slicing?", options: ["list[1:5:2]", "list(1-5)", "list[::5]"], answer: "list[1:5:2]" },
+      { q: "3️⃣ Output of len([1, [2,3], 4])?", options: ["3", "4", "2"], answer: "3" },
+      { q: "4️⃣ Keyword to handle exceptions?", options: ["try", "catch", "error"], answer: "try" },
+      { q: "5️⃣ Output of bool('False')?", options: ["False", "True", "Error"], answer: "True" }
+    ];
+
+    const questions = category === 'python' ? pythonQuestions : mathQuestions;
+
+    // Load questions dynamically
+    questions.forEach((q, index) => {
+      const div = document.createElement('div');
+      div.classList.add('question');
+      div.innerHTML = `<p>${q.q}</p>` + q.options.map(opt =>
+        `<label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`
+      ).join('');
+      quizForm.appendChild(div);
+    });
+
+    // Timer logic
+    let timeLeft = 60;
+    const timeDisplay = document.getElementById('time');
+    const timer = setInterval(() => {
+      timeLeft--;
+      timeDisplay.textContent = timeLeft;
+      if (timeLeft <= 0) finishQuiz();
+    }, 1000);
+
+    // Submit logic
+    document.getElementById('submitBtn').addEventListener('click', finishQuiz);
+
+    function finishQuiz() {
+      clearInterval(timer);
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === q.answer) score++;
+      });
+      document.getElementById('result').innerHTML =
+        `<h3>Your score: ${score} / ${questions.length}</h3>` +
+        `<p>${score >= Math.ceil(questions.length/2) ? "🎉 Great job!" : "💪 Keep practicing!"}</p>`;
+    }
+  </script>
+</body>
+</html>
